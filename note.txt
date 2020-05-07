@@ -1,2 +1,0 @@
-By RJK Control & Monitoring by Websocket via MQTT Protocol
-May 7 2020 
