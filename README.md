@@ -20,3 +20,5 @@ control LED GPIO 4  PWM(8 bit)
 Display text,gauge,graph from Device reply results
 ![img](https://phpteach.net/imgiots/testiot2/iomoni4.png)
 ![img](https://phpteach.net/imgiots/testiot2/iomoni1.png)
+![img](https://phpteach.net/imgiots/testiot2/iomoni3.png)
+![img](https://phpteach.net/imgiots/testiot2/iomoni2.png)
