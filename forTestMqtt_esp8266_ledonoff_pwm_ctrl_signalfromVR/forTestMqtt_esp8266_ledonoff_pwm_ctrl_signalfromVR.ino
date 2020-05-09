@@ -6,6 +6,7 @@
 #define Ledpwm 4 //GPIO 4
 #define VR A0 //VR analog input
 #define Vpk 0.82 //Peak at 255 in GPIO4 output
+#define Vdrop_pwm 0.41 //at 128 
 
 //at the beginning of sketch
 //ADC_MODE(ADC_VCC); //vcc read
@@ -45,6 +46,10 @@ void mqttreconnect(){
   }
 }
 
+float Volts_pwm(int adc){
+  float vm = (Vdrop_pwm/128)*adc;
+  return vm;
+}
 float Volts(int adc){
   float v = (3.28/1024)*adc;
   return v;
@@ -58,11 +63,14 @@ float Vrms(int adc){
   float vrms = (Vpk*adc)/255;
   return vrms;
 }
+
+
 void SendPWM(int pwm){
   StaticJsonDocument<300> data;
   data["adc1"] = pwm;
   data["duty"] = DutyCycle_8bit(pwm);
   data["vrms"] = Vrms(pwm);
+  data["vm"] = Volts_pwm(pwm);
   serializeJson(data, Serial);
   Serial.println("Send OK...");
    char buffer[512];
