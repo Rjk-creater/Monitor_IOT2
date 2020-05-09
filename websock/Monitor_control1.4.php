@@ -38,7 +38,7 @@ var adc1;
 let gadc = 0;
 let dc=0; 
 var adc2;
-var vrd,vr,vrms;
+var vrd,vr,vrms,vm;
 var updateInterval = <?php echo $updateInterval ?>;
 var xValue1 = <?php echo $x ?>;
 var dataPoints1 = [{'x':xValue1,'y':adc1}]; //Area chart
@@ -46,6 +46,7 @@ var dataPoints2 = [{'x':xValue1,'y':adc2}]; //Area chart
 var dataPointsvr1 = [{'x':xValue1,'y':vrd}];
 var dataPointsvr2 = [{'x':xValue1,'y':vr}];
 var dataPointsL1 = [{'x':xValue1,'y':vrms}];
+var dataPointsL2 = [{'x':xValue1,'y':vm}];
 
 google.charts.load('current', {'packages':['gauge']});
 google.charts.setOnLoadCallback(drawChart1);
@@ -267,10 +268,7 @@ Line1 = function() {
  var chartL1 = new CanvasJS.Chart("chartLine1", {
   theme: "dark2",
   title: {
-    text: "Realtime Vrms"
-  },
-  axisX:{
-    title: "Time in millisecond"
+    text: "ESP8266 Send Realtime Vrms pwm"
   },
   axisY:{
     includeZero: false,
@@ -278,6 +276,7 @@ Line1 = function() {
   },
   data: [{
     type: "line",
+    xValueType: "dateTime",
     lineColor:"#2ffbe1", 
     yValueFormatString: "#,##0.0#",
     toolTipContent: "{y} Volts",
@@ -297,6 +296,38 @@ function updateChart() {
  
 }
 
+Line2 = function() {
+ 
+ var chartL1 = new CanvasJS.Chart("chartLine2", {
+  theme: "dark1",
+  title: {
+    text: "ESP8266 Send Realtime Volts pwm"
+  },
+  axisY:{
+    includeZero: false,
+    suffix: "Volts"
+  },
+  data: [{
+    type: "line",
+    xValueType: "dateTime",
+    lineColor:"#fb64e9", 
+    yValueFormatString: "#,##0.0#",
+    toolTipContent: "{y} Volts",
+    dataPoints: dataPointsL2
+  }]
+});
+chartL1.render();
+ 
+var updateInterval = 2000;
+setInterval(function () { updateChart() }, updateInterval);
+ 
+function updateChart() {
+  dataPointsL2.push({ x: xValue1, y:vm});
+  xValue1 += updateInterval;
+  chartL1.render();
+};
+ 
+}
  $(document).ready(function(){
          $('#serv').val(host);
          $('#prt').val("Port "+port);
@@ -313,6 +344,7 @@ function updateChart() {
             vrarea1();
             vrarea2();
             Line1();
+            Line2();
          })
 
          $('#dchs').click(function(){
@@ -426,6 +458,8 @@ function onMessageArrived(message) {
               $('#duty').val(dc)
               vrms = ldrdata.vrms
               $('#vrms').val(vrms)
+              vm = ldrdata.vm
+              console.log(vm)
     }
 }
 
@@ -600,6 +634,7 @@ function Disconnect() {
             <form class="form-inline" style="margin-top:5px;">    
                 <label for="duty">Vrms(V)</label>&nbsp;
                 <input type="text" class="form-control mb-2 mr-sm-2" id="vrms" size="3" readonly>
+             
              </form>
            </div>
          </div>
@@ -631,7 +666,14 @@ function Disconnect() {
       </div>
       <div id="collapse6" class="collapse" data-parent="#accordion">
        <div class="card-body">
-         <div id="chartLine1" style="height: 370px; width: 100%;"></div>
+       <div class="row">
+         <div class="col-6">
+           <div id="chartLine1" style="height: 370px; width: 100%;"></div>
+         </div>
+         <div class="col-6">
+          <div id="chartLine2" style="height: 370px; width: 100%;"></div>
+         </div>
+       </div>
       </div>
       </div>
      </div>
